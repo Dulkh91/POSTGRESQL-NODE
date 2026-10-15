@@ -22,6 +22,23 @@ app.get("/users", async(req,res)=>{
     }
 })
 
+// GET: ទាញយក Post ទាំងអស់ជាមួយព័ត៌មាន Author
+app.get("/posts", async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({
+      include: { author: true },
+      orderBy: { createAt: "desc" },
+    });
+
+    return res.json(posts);
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+    return res.status(500).json({
+      message: "Failed to fetch posts",
+    });
+  }
+});
+
 // POST: បង្កើត User ថ្មី
 app.post("/users", async(req, res) => {
   try {
@@ -56,6 +73,50 @@ app.post("/users", async(req, res) => {
 
     res.status(500).json({
       message: "Failed to create user",
+      detail: error.message,
+    });
+  }
+});
+
+// POST: បង្កើត Post ថ្មី និងភ្ជាប់ទៅ User ដែលមានស្រាប់
+app.post("/posts", async (req, res) => {
+  try {
+    const { title, body, authorId } = req.body ?? {};
+    const parsedAuthorId = Number(authorId);
+
+    if (typeof title !== "string" || !title.trim() || !Number.isInteger(parsedAuthorId) || parsedAuthorId < 1) {
+      return res.status(400).json({
+        message: "A title and a valid authorId are required",
+      });
+    }
+
+    const post = await prisma.post.create({
+      data: {
+        title: title.trim(),
+        ...(body === undefined ? {} : { body }),
+        author: {
+          connect: { id: parsedAuthorId },
+        },
+      },
+      include: { author: true },
+    });
+
+    return res.status(201).json(post);
+  } catch (error) {
+    console.error("Failed to create post:", error);
+
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Author not found" });
+    }
+
+    if (error.name === "PrismaClientInitializationError") {
+      return res.status(503).json({
+        message: "Cannot connect to PostgreSQL. Make sure the database is running at localhost:5432.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to create post",
       detail: error.message,
     });
   }

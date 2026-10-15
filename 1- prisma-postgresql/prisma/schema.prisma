@@ -20,4 +20,19 @@ model User{
   email String @unique
   createAt DateTime @default(now())
 
+  posts Post[]
+
+}
+
+
+model Post{
+  id Int @id @default(autoincrement())
+  title String
+  body String?
+  published Boolean @default(false)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
 }

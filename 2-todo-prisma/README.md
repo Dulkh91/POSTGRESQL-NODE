@@ -43,3 +43,11 @@ responce:
     }
 }
 ```
+
+
+### patch និង put 
+PATCH ប្រើសម្រាប់ update ទិន្នន័យដែរ—វាប្ដូរតែ field ដែលផ្ញើមកប៉ុណ្ណោះ។ ដូច្នេះ route មួយនេះអាចប្រើសម្រាប់ completed, title, description ឬ priority បាន។
+
+
+PUT ជាទូទៅប្រើពេលចង់ជំនួស resource ទាំងមូល។
+

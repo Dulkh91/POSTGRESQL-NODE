@@ -1,0 +1,45 @@
+# create post todo
+
+post method of todos:
+```bash
+const todos = await prisma.todo.create({
+       data:{
+        title: title.trim(),
+        ...(description === undefined ? {}: {description}),
+        priority,
+        author: {
+          connect: {id: parsedAuthorId}
+        },
+      },
+      include: {author: true}
+    })
+```
+
+postman body:
+```bash
+{
+    "title": "រៀន prisma",
+    "description": "រៀន prisma ជាមួយ node express",
+    "priority": "low",
+    "userId": 1
+}
+```
+responce:
+```bash
+{
+    "id": 1,
+    "title": "រៀន prisma",
+    "description": "រៀន prisma ជាមួយ node express",
+    "completed": false,
+    "priority": "low",
+    "createdAt": "2026-10-17T09:43:48.183Z",
+    "updatedAt": "2026-10-17T09:43:48.183Z",
+    "userId": 1,
+    "user": {
+        "id": 1,
+        "name": "Dul",
+        "email": "dul@example.com",
+        "createdAt": "2026-10-17T08:55:52.062Z"
+    }
+}
+```
